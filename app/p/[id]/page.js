@@ -176,7 +176,7 @@ export default function ProposalPage() {
                         zIndex: showVideo ? 1 : -1,
                         width: '100%',
                         maxWidth: '180px',
-                        aspectRatio: '3/4',
+                        aspectRatio: '9/16',
                         height: showVideo ? 'auto' : '1px'
                     }}
                 />
