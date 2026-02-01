@@ -143,14 +143,20 @@ export default function BuilderPage() {
     };
 
     const moveNoButton = () => {
-        const randomX = Math.floor(Math.random() * 200) - 100;
-        const randomY = Math.floor(Math.random() * 200) - 100;
+        let x, y;
+        // Stay within the percentage bounds of the 320x640 preview frame
+        do {
+            x = Math.random() * 70 + 15; // 15% to 85% left
+            y = Math.random() * 75 + 10; // 10% to 85% top
+        } while (Math.abs(x - 50) < 30 && Math.abs(y - 50) < 35);
+
         setNoBtnPos({
             position: 'absolute',
-            left: `calc(50% + ${randomX}px)`,
-            top: `calc(50% + ${randomY}px)`,
+            left: `${x}%`,
+            top: `${y}%`,
             zIndex: 10,
-            transform: 'translate(-50%, -50%)'
+            transform: 'translate(-50%, -50%)',
+            margin: 0
         });
     };
 

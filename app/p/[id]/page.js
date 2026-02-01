@@ -73,14 +73,21 @@ export default function ProposalPage() {
     };
 
     const moveNoButton = () => {
-        const randomX = Math.floor(Math.random() * 200) - 100;
-        const randomY = Math.floor(Math.random() * 200) - 100;
+        let x, y;
+        // Generate coordinates as percentages of viewport
+        // Stay between 10% and 80% to ensure the 150px wide button stays on screen
+        do {
+            x = Math.random() * 80 + 10; // 10vw to 90vw
+            y = Math.random() * 80 + 10; // 10vh to 90vh
+        } while (Math.abs(x - 50) < 30 && Math.abs(y - 50) < 35); // Avoid central video & text area 
+
         setNoBtnPos({
-            position: 'absolute',
-            left: `calc(50% + ${randomX}px)`,
-            top: `calc(50% + ${randomY}px)`,
-            zIndex: 10,
-            transform: 'translate(-50%, -50%)'
+            position: 'fixed',
+            left: `${x}vw`,
+            top: `${y}vh`,
+            zIndex: 100,
+            transform: 'translate(-50%, -50%)',
+            margin: 0
         });
     };
 
