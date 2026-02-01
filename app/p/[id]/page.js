@@ -18,6 +18,7 @@ export default function ProposalPage() {
     const [noBtnPos, setNoBtnPos] = useState({ position: 'relative' });
     
     const audioRef = useRef(null);
+    const videoRef = useRef(null);
 
     useEffect(() => {
         const fetchProposal = async () => {
@@ -49,6 +50,24 @@ export default function ProposalPage() {
         if (!isNoRunning) {
             setIsNoRunning(true);
             setShowVideo(true);
+            
+            if (videoRef.current) {
+                // Aggressive unmuting for audio
+                videoRef.current.muted = false;
+                videoRef.current.volume = 1.0;
+                
+                const startPlay = () => {
+                    videoRef.current.play().catch(err => {
+                        console.error("Playback failed, retrying...", err);
+                        // Try unmuting again before retry
+                        videoRef.current.muted = false;
+                        videoRef.current.play();
+                    });
+                };
+
+                // If playback hasn't started, try it
+                startPlay();
+            }
         }
         moveNoButton();
     };
@@ -138,15 +157,24 @@ export default function ProposalPage() {
     return (
         <div className="proposal-container">
             <div className="proposal-card">
-                {showVideo ? (
-                    <video 
-                        src="/Maroon 5 - Sugar.mp4#t=42" 
-                        autoPlay 
-                        loop 
-                        playsInline
-                        className="proposal-media" 
-                    />
-                ) : (
+                <video 
+                    ref={videoRef}
+                    src="/sugar.mp4#t=42" 
+                    loop 
+                    playsInline
+                    preload="auto"
+                    className="proposal-media" 
+                    style={{ 
+                        position: showVideo ? 'relative' : 'absolute',
+                        opacity: showVideo ? 1 : 0.01,
+                        pointerEvents: showVideo ? 'auto' : 'none',
+                        zIndex: showVideo ? 1 : -1,
+                        width: '200px',
+                        height: showVideo ? '200px' : '1px'
+                    }}
+                />
+
+                {!showVideo && (
                     <img 
                         src={view === 'yes' ? '/images/dance.gif' : proposal.image_url} 
                         alt="Proposal" 

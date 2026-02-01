@@ -20,11 +20,12 @@ export default function BuilderPage() {
     const [isUploading, setIsUploading] = useState(false);
     const [mounted, setMounted] = useState(false);
     const [previewView, setPreviewView] = useState('ask');
-    const [previewVideo, setPreviewVideo] = useState(null);
+    const [previewVideo, setPreviewVideo] = useState(false);
     const [noBtnPos, setNoBtnPos] = useState({ position: 'relative' });
     const [isNoRunning, setIsNoRunning] = useState(false);
     const [showMobilePreview, setShowMobilePreview] = useState(false);
     const audioRef = useRef(null);
+    const previewVideoRef = useRef(null);
 
     useEffect(() => {
         setMounted(true);
@@ -33,7 +34,7 @@ export default function BuilderPage() {
     // RESET PREVIEW when form details change
     useEffect(() => {
         setPreviewView('ask');
-        setPreviewVideo(null);
+        setPreviewVideo(false);
         setNoBtnPos({ position: 'relative' });
         setIsNoRunning(false);
     }, [formData]);
@@ -125,7 +126,18 @@ export default function BuilderPage() {
         e.preventDefault();
         if (!isNoRunning) {
             setIsNoRunning(true);
-            setPreviewVideo('/Maroon 5 - Sugar.mp4#t=42');
+            setPreviewVideo(true); // Now acts as a visibility toggle
+            
+            if (previewVideoRef.current) {
+                previewVideoRef.current.muted = false;
+                previewVideoRef.current.volume = 1.0;
+                previewVideoRef.current.play().catch(err => {
+                    console.error("Preview video failed:", err);
+                    // Single retry
+                    previewVideoRef.current.muted = false;
+                    previewVideoRef.current.play();
+                });
+            }
         }
         moveNoButton();
     };
@@ -369,16 +381,24 @@ export default function BuilderPage() {
                 
                 <div className="preview-frame">
                     <div className="preview-inner-content">
-                        {previewVideo ? (
-                            <video 
-                                src={previewVideo} 
-                                autoPlay 
-                                loop 
-                                playsInline
-                                className="preview-image" 
-                                style={{ height: '180px', objectFit: 'cover' }}
-                            />
-                        ) : (
+                        <video 
+                            ref={previewVideoRef}
+                            src="/sugar.mp4#t=42" 
+                            loop 
+                            playsInline
+                            preload="auto"
+                            className="preview-image" 
+                            style={{ 
+                                height: previewVideo ? '180px' : '1px', 
+                                objectFit: 'cover',
+                                position: previewVideo ? 'relative' : 'absolute',
+                                opacity: previewVideo ? 1 : 0.01,
+                                zIndex: previewVideo ? 1 : -1,
+                                width: '180px'
+                            }}
+                        />
+
+                        {!previewVideo && (
                             <img 
                                 src={previewView === 'yes' ? '/images/dance.gif' : (formData.imageUrl || '/images/catflower.jpg')} 
                                 className={`preview-image ${previewView === 'yes' ? 'pulse-animation' : ''}`} 
