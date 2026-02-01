@@ -59,7 +59,7 @@ export default function BuilderPage() {
             setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Upload failed. Make sure you have created a 'scrap_images' bucket in Supabase and set it to Public!");
+            alert(`Upload failed: ${error.message || 'Unknown error'}. \n\nCheck your console for details. Common causes:\n1. Bucket 'scrap_images' doesn't exist\n2. Missing Storage Policies (RLS) in Supabase\n3. Invalid Supabase keys`);
         } finally {
             setIsUploading(false);
         }
@@ -187,9 +187,16 @@ export default function BuilderPage() {
             const order = await res.json();
             if (!order.id) throw new Error("Could not create order");
 
-            console.log("Initializing Razorpay with key starting with:", (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'NONE').substring(0, 8));
+            const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+            if (!razorpayKey) {
+                alert("Razorpay Key ID is missing! Please add NEXT_PUBLIC_RAZORPAY_KEY_ID to your Vercel Environment Variables.");
+                setIsSaving(false);
+                return;
+            }
+
+            console.log("Initializing Razorpay...");
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                key: razorpayKey,
                 amount: order.amount,
                 currency: order.currency,
                 name: "ValenTiny",
