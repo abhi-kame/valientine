@@ -45,6 +45,11 @@ export async function GET(req) {
             return Response.json({ error: 'Proposal ID is required' }, { status: 400 });
         }
 
+        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY && !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY)) {
+            console.error('CRITICAL: Supabase keys are missing on Vercel! Add them to Environment Variables.');
+            return Response.json({ error: 'Server Configuration Error' }, { status: 500 });
+        }
+
         const { data, error } = await supabase
             .from('proposals')
             .select('*')

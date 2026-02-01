@@ -85,6 +85,11 @@ export default function ProposalPage() {
     };
 
     const handleYesClick = async () => {
+        // Stop the "Sugar" song video
+        if (videoRef.current) {
+            videoRef.current.pause();
+        }
+        
         setShowVideo(false);
         setView('yes');
         
@@ -210,11 +215,7 @@ export default function ProposalPage() {
                     </div>
                 )}
 
-                {view === 'yes' && (
-                    <div className="celebration">
-                        <p className="celebration-text">🎉 Your answer has been sent! 🎉</p>
-                    </div>
-                )}
+
             </div>
 
             <audio ref={audioRef} src="/Minions Cheering.mp4" />

@@ -162,7 +162,10 @@ export default function BuilderPage() {
     };
 
     const handleYesPreview = () => {
-        setPreviewVideo(null);
+        if (previewVideoRef.current) {
+            previewVideoRef.current.pause();
+        }
+        setPreviewVideo(false);
         setPreviewView('yes');
         if (audioRef.current) {
             audioRef.current.play().catch(e => console.error("Audio failed", e));
