@@ -174,8 +174,10 @@ export default function ProposalPage() {
                         opacity: showVideo ? 1 : 0.01,
                         pointerEvents: showVideo ? 'auto' : 'none',
                         zIndex: showVideo ? 1 : -1,
-                        width: '200px',
-                        height: showVideo ? '200px' : '1px'
+                        width: '100%',
+                        maxWidth: '180px',
+                        aspectRatio: '3/4',
+                        height: showVideo ? 'auto' : '1px'
                     }}
                 />
 
@@ -198,6 +200,12 @@ export default function ProposalPage() {
                 {view === 'ask' && (
                     <div className="buttons-container">
                         <button 
+                            className="btn yes-btn"
+                            onClick={handleYesClick}
+                        >
+                            Yes! 💕
+                        </button>
+                        <button 
                             className="btn no-btn"
                             style={noBtnPos}
                             onMouseEnter={isNoRunning ? moveNoButton : undefined}
@@ -205,12 +213,6 @@ export default function ProposalPage() {
                             onClick={handleNoClick}
                         >
                             No
-                        </button>
-                        <button 
-                            className="btn yes-btn"
-                            onClick={handleYesClick}
-                        >
-                            Yes! 💕
                         </button>
                     </div>
                 )}
@@ -245,11 +247,11 @@ export default function ProposalPage() {
                     gap: 20px;
                 }
                 .proposal-media {
-                    width: 200px;
-                    height: 200px;
-                    object-fit: cover;
+                    width: 100%;
+                    max-width: 180px;
                     border-radius: 20px;
                     box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+                    object-fit: cover;
                 }
                 .proposal-media.pulse {
                     animation: pulse 1s ease-in-out infinite;
@@ -280,13 +282,17 @@ export default function ProposalPage() {
                     justify-content: center;
                 }
                 .btn {
-                    padding: 12px 30px;
+                    width: 150px;
+                    height: 50px;
                     border-radius: 50px;
                     font-weight: 700;
                     font-size: 1.1rem;
                     border: none;
                     cursor: pointer;
                     transition: all 0.2s;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .no-btn {
                     background: white;

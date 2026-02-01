@@ -285,7 +285,7 @@ export default function BuilderPage() {
                         <input 
                             name="name" 
                             value={formData.name}
-                            placeholder="e.g. Suhani" 
+                            placeholder="e.g. Sakshi" 
                             onChange={handleChange} 
                             required 
                         />
@@ -399,12 +399,13 @@ export default function BuilderPage() {
                             preload="auto"
                             className="preview-image" 
                             style={{ 
-                                height: previewVideo ? '180px' : '1px', 
-                                objectFit: 'cover',
                                 position: previewVideo ? 'relative' : 'absolute',
                                 opacity: previewVideo ? 1 : 0.01,
                                 zIndex: previewVideo ? 1 : -1,
-                                width: '180px'
+                                width: '180px',
+                                aspectRatio: '3/4',
+                                height: previewVideo ? 'auto' : '1px',
+                                objectFit: 'cover'
                             }}
                         />
 
@@ -426,18 +427,18 @@ export default function BuilderPage() {
                         {previewView === 'ask' && (
                             <div className="preview-buttons">
                                 <button 
+                                    className="preview-btn yes" 
+                                    onClick={handleYesPreview}
+                                >
+                                    Yes
+                                </button>
+                                <button 
                                     className="preview-btn no" 
                                     style={noBtnPos}
                                     onMouseEnter={isNoRunning ? moveNoButton : undefined}
                                     onClick={handleNoInteraction}
                                 >
                                     No
-                                </button>
-                                <button 
-                                    className="preview-btn yes" 
-                                    onClick={handleYesPreview}
-                                >
-                                    Yes
                                 </button>
                             </div>
                         )}
@@ -640,13 +641,20 @@ export default function BuilderPage() {
                     display: flex;
                     gap: 10px;
                     margin-top: 10px;
+                    width: 100%;
+                    max-width: 250px;
                 }
                 .preview-btn {
-                    padding: 8px 20px;
+                    width: 100px;
+                    height: 40px;
                     border-radius: 50px;
                     font-weight: 700;
                     border: none;
                     font-size: 0.9rem;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
                 .preview-btn.no {
                     background: white;
