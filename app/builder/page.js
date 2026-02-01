@@ -23,6 +23,7 @@ export default function BuilderPage() {
     const [previewVideo, setPreviewVideo] = useState(null);
     const [noBtnPos, setNoBtnPos] = useState({ position: 'relative' });
     const [isNoRunning, setIsNoRunning] = useState(false);
+    const [showMobilePreview, setShowMobilePreview] = useState(false);
     const audioRef = useRef(null);
 
     useEffect(() => {
@@ -174,15 +175,43 @@ export default function BuilderPage() {
             const order = await res.json();
             if (!order.id) throw new Error("Could not create order");
 
+            console.log("Initializing Razorpay with key starting with:", (process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'NONE').substring(0, 8));
             const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_your_id',
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: order.amount,
                 currency: order.currency,
                 name: "ValenTiny",
                 description: `Proposal for ${formData.name}`,
                 order_id: order.id,
-                handler: function (response) {
-                    const shareUrl = `${window.location.origin}/p/unique-id?name=${encodeURIComponent(formData.name)}&q=${encodeURIComponent(formData.question)}&img=${encodeURIComponent(formData.imageUrl)}&notify=${encodeURIComponent(formData.recipientEmail)}`;
+                handler: async function (response) {
+                    // Generate unique proposal ID
+                    const uniqueId = `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
+                    
+                    // Save proposal to Supabase
+                    try {
+                        const saveRes = await fetch('/api/proposals', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id: uniqueId,
+                                name: formData.name,
+                                question: formData.question,
+                                imageUrl: formData.imageUrl,
+                                notifyEmail: formData.recipientEmail,
+                                paymentId: response.razorpay_payment_id
+                            })
+                        });
+                        
+                        const saveData = await saveRes.json();
+                        if (!saveRes.ok) {
+                            console.error('Failed to save proposal:', saveData.error);
+                        }
+                    } catch (err) {
+                        console.error('Error saving proposal:', err);
+                    }
+                    
+                    // Redirect to success page with clean URL
+                    const shareUrl = `${window.location.origin}/p/${uniqueId}`;
                     router.push(`/success?link=${encodeURIComponent(shareUrl)}`);
                 },
                 prefill: {
@@ -299,6 +328,14 @@ export default function BuilderPage() {
                         />
                     </div>
 
+                    <button 
+                        type="button" 
+                        className="mobile-preview-trigger" 
+                        onClick={() => setShowMobilePreview(true)}
+                    >
+                        <Eye size={18} /> Preview Proposal
+                    </button>
+
                     <button type="submit" className="save-btn" disabled={isSaving}>
                         {isSaving ? 'Processing...' : 'Pay & Publish — ₹199'}
                     </button>
@@ -307,7 +344,15 @@ export default function BuilderPage() {
                 </form>
             </div>
 
-            <div className="preview-area">
+            <div className={`preview-area ${showMobilePreview ? 'mobile-open' : ''}`}>
+                {showMobilePreview && (
+                    <button 
+                        className="close-preview" 
+                        onClick={() => setShowMobilePreview(false)}
+                    >
+                        ✕ Close Preview
+                    </button>
+                )}
                 <div className="preview-label">
                     <Eye size={16} /> Live Preview (Mobile)
                 </div>
@@ -369,7 +414,6 @@ export default function BuilderPage() {
 
             <style jsx>{`
                 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
-                
                 .builder-layout {
                     display: grid;
                     grid-template-columns: 420px 1fr;
@@ -575,8 +619,59 @@ export default function BuilderPage() {
                 }
 
                 @media (max-width: 900px) {
-                    .builder-layout { grid-template-columns: 1fr; }
-                    .preview-area { display: none; }
+                    .builder-layout { 
+                        grid-template-columns: 1fr; 
+                        height: auto;
+                        overflow-y: visible;
+                    }
+                    .sidebar {
+                        border-right: none;
+                        border-bottom: 1px solid #eee;
+                        padding: 20px;
+                        height: auto;
+                        overflow-y: visible;
+                    }
+                    .preview-area { 
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        z-index: 1000;
+                        background: white;
+                        display: none;
+                        padding: 0;
+                    }
+                    .preview-area.mobile-open {
+                        display: flex;
+                    }
+                    .close-preview {
+                        position: absolute;
+                        top: 20px;
+                        right: 20px;
+                        z-index: 1001;
+                        background: #ff4d79;
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 50px;
+                        font-weight: 700;
+                    }
+                    .mobile-preview-trigger {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        padding: 14px;
+                        background: white;
+                        border: 2px solid #ff4d79;
+                        color: #ff4d79;
+                        border-radius: 12px;
+                        font-weight: 700;
+                        cursor: pointer;
+                        margin-bottom: 10px;
+                        width: 100%;
+                    }
                 }
             `}</style>
         </div>
