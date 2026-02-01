@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
-import { Heart, Settings, Eye, CheckCircle, CreditCard, Upload, Loader2 } from 'lucide-react';
+import { Heart, Settings, Eye, CheckCircle, CreditCard, Upload, Loader2, Clipboard } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { uploadBase64Image } from '../../lib/storageUtils';
 
 export default function BuilderPage() {
     const router = useRouter();
@@ -44,21 +45,63 @@ export default function BuilderPage() {
         try {
             const fileName = `${Date.now()}-${file.name}`;
             const { data, error } = await supabase.storage
-                .from('images')
+                .from('scrap_images')
                 .upload(fileName, file);
 
             if (error) throw error;
 
             const { data: { publicUrl } } = supabase.storage
-                .from('images')
+                .from('scrap_images')
                 .getPublicUrl(fileName);
 
             setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
         } catch (error) {
             console.error("Upload failed", error);
-            alert("Upload failed. Make sure you have created an 'images' bucket in Supabase and set it to Public!");
+            alert("Upload failed. Make sure you have created a 'scrap_images' bucket in Supabase and set it to Public!");
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const handlePasteImage = async () => {
+        try {
+            const clipboardItems = await navigator.clipboard.read();
+            let blob = null;
+            
+            for (const item of clipboardItems) {
+                const imageType = item.types.find(type => type.startsWith('image/'));
+                if (imageType) {
+                    blob = await item.getType(imageType);
+                    break;
+                }
+            }
+
+            if (!blob) {
+                alert('No image found in clipboard! Copy an image first.');
+                return;
+            }
+
+            setIsUploading(true);
+            
+            // Convert Blob to Base64 to use our new utility
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+                const base64data = reader.result;
+                try {
+                    const publicUrl = await uploadBase64Image(base64data);
+                    setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+                } catch (error) {
+                    console.error("Paste upload failed", error);
+                    alert("Failed to upload pasted image.");
+                } finally {
+                    setIsUploading(false);
+                }
+            };
+
+        } catch (err) {
+            console.error("Clipboard access failed", err);
+            alert("Could not access clipboard. Please allow clipboard permissions or use the upload button.");
         }
     };
 
@@ -224,6 +267,14 @@ export default function BuilderPage() {
                                 disabled={isUploading}
                             />
                         </label>
+                        <button 
+                            type="button" 
+                            onClick={handlePasteImage}
+                            className="paste-btn"
+                            disabled={isUploading}
+                        >
+                            <Clipboard size={16} /> Paste from Clipboard
+                        </button>
                     </div>
 
                     <div className="input-group">
@@ -373,6 +424,26 @@ export default function BuilderPage() {
                 }
                 .upload-label:hover {
                     background: #ffe0e6;
+                }
+                .paste-btn {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    padding: 12px;
+                    background: #f0f7ff;
+                    border: 2px dashed #4d94ff;
+                    border-radius: 12px;
+                    color: #4d94ff;
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 0.9rem;
+                    transition: all 0.2s;
+                    margin-top: 8px;
+                    width: 100%;
+                }
+                .paste-btn:hover {
+                    background: #e0f0ff;
                 }
                 .spinner {
                     animation: rotate 1s linear infinite;
