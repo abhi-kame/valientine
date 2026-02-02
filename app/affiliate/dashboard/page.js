@@ -63,7 +63,7 @@ export default function AffiliateDashboard() {
   if (!affiliate) return (
     <div className="no-affiliate">
       <h2>Become an Affiliate</h2>
-      <p>Start earning ₹60 per successful referral!</p>
+      <p>Start earning 30% commission per successful referral!</p>
       <a href="/affiliate/signup" className="btn-primary">Sign Up Now</a>
     </div>
   );

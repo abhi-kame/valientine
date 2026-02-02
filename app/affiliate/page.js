@@ -17,7 +17,7 @@ export default function AffiliateLanding() {
       <header className="hero">
         <div className="badge">💸 High Commission Program</div>
         <h1>Turn Love into <span className="gradient-text">Revenue</span></h1>
-        <p>Promote the world's most creative Valentine's proposal platform and earn ₹60 for every sale you generate.</p>
+        <p>Promote the world's most creative Valentine's proposal platform and earn 30% commission for every sale you generate.</p>
         
         <div className="cta-group">
           <Link href="/affiliate/signup" className="primary-btn">
@@ -31,7 +31,7 @@ export default function AffiliateLanding() {
         <div className="feature-card">
           <DollarSign className="icon" />
           <h3>High Commision</h3>
-          <p>Earn ₹60 on every ₹199 sale. That's a 30% commission rate!</p>
+          <p>Earn ₹14.7 on every ₹49 sale. That's a flat 30% commission rate!</p>
         </div>
         <div className="feature-card">
           <Zap className="icon" />

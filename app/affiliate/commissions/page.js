@@ -126,7 +126,7 @@ export default function CommissionsPage() {
             <h1>My Commissions</h1>
           </div>
           <div className="header-meta">
-            <div className="commission-pill">₹60 Per Sale</div>
+            <div className="commission-pill">30% Per Sale</div>
           </div>
         </header>
 

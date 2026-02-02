@@ -24,6 +24,7 @@ export default function BuilderPage() {
     const [noBtnPos, setNoBtnPos] = useState({ position: 'relative' });
     const [isNoRunning, setIsNoRunning] = useState(false);
     const [showMobilePreview, setShowMobilePreview] = useState(false);
+    const [razorpayLoaded, setRazorpayLoaded] = useState(false);
     const audioRef = useRef(null);
     const previewVideoRef = useRef(null);
 
@@ -187,7 +188,7 @@ export default function BuilderPage() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
-                    amount: 199, 
+                    amount: 49, 
                     proposalId: `val-${Date.now()}`,
                     name: formData.name 
                 })
@@ -267,8 +268,8 @@ export default function BuilderPage() {
                 },
             };
 
-            if (!window.Razorpay) {
-                alert("Razorpay is still loading. Please wait a second.");
+            if (!razorpayLoaded && !window.Razorpay) {
+                alert("Razorpay is still loading. Please check your internet connection.");
                 return;
             }
             const rzp = new window.Razorpay(options);
@@ -281,11 +282,17 @@ export default function BuilderPage() {
         }
     };
 
+
+
     if (!mounted) return null;
 
     return (
         <div className="builder-layout">
-            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
+            <Script 
+                src="https://checkout.razorpay.com/v1/checkout.js" 
+                strategy="lazyOnload" 
+                onLoad={() => setRazorpayLoaded(true)}
+            />
             <div className="sidebar">
                 <div className="sb-header">
                     <Heart fill="#ff4d79" color="#ff4d79" />
@@ -382,7 +389,7 @@ export default function BuilderPage() {
                     </button>
 
                     <button type="submit" className="save-btn" disabled={isSaving}>
-                        {isSaving ? 'Processing...' : 'Pay & Publish — ₹199'}
+                        {isSaving ? 'Processing...' : 'Pay & Publish — ₹49'}
                     </button>
                     
                     <p className="form-note">🔒 Payments handled securely via Razorpay</p>

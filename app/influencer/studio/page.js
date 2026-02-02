@@ -65,7 +65,7 @@ export default function InfluencerDashboard() {
     <div className="no-access">
       <Heart size={64} color="#ff4d79" />
       <h2>Become a ValenTiny Creator</h2>
-      <p>Your account is not yet registered as an approved influencer partner. Apply now to start earning ₹60 per sale.</p>
+      <p>Your account is not yet registered as an approved influencer partner. Apply now to start earning 30% per sale.</p>
       <div className="action-buttons">
         <Link href="/affiliate/signup" className="btn-primary">Apply Now</Link>
         <Link href="/" className="btn-secondary">Back to Site</Link>

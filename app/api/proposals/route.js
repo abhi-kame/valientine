@@ -40,7 +40,7 @@ export async function POST(req) {
                 .single();
 
             if (affiliate) {
-                const commissionAmount = 60; // Fixed ₹60 commission or calculate based on affiliate.commission_rate
+                const commissionAmount = 14.7; // 30% of 49 INR
                 
                 await supabase
                     .from('commissions')
