@@ -1,7 +1,7 @@
-
 export const metadata = {
-  title: 'Build Your Valentine Proposal | ValenTiny',
-  description: 'Customize your interactive Valentine proposal page. Add names, images, and music to make it perfect.',
+  title: 'Customize Your Proposal',
+  description: 'Design a unique, personalized Valentine proposal page. Upload photos, write your message, and set up instant email alerts.',
+  keywords: ['proposal builder', 'valentine card maker', 'personalized proposal link'],
 };
 
 export default function BuilderLayout({ children }) {

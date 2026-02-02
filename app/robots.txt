@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin-v-app/
+Disallow: /affiliate/dashboard/
+Disallow: /influencer/studio/
+
+Sitemap: https://valentiny.com/sitemap.xml
