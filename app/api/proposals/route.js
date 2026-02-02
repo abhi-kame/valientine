@@ -2,9 +2,10 @@ import { supabase } from '../../../lib/supabase';
 
 export async function POST(req) {
     try {
-        const { id, name, question, imageUrl, notifyEmail, paymentId } = await req.json();
+        const { id, name, question, imageUrl, notifyEmail, paymentId, refCode } = await req.json();
 
-        const { data, error } = await supabase
+        // 1. Insert Proposal
+        const { data: proposal, error } = await supabase
             .from('proposals')
             .insert([
                 {
@@ -15,7 +16,8 @@ export async function POST(req) {
                     notify_email: notifyEmail,
                     payment_id: paymentId,
                     created_at: new Date().toISOString(),
-                    status: 'active'
+                    status: 'active',
+                    ref_code: refCode // Link to ref code for records
                 }
             ])
             .select()
@@ -29,7 +31,29 @@ export async function POST(req) {
             return Response.json({ error: error.message }, { status: 500 });
         }
 
-        return Response.json({ success: true, proposal: data });
+        // 2. Handle Affiliate Commission
+        if (refCode) {
+            const { data: affiliate } = await supabase
+                .from('affiliates')
+                .select('id, commission_rate')
+                .eq('ref_code', refCode)
+                .single();
+
+            if (affiliate) {
+                const commissionAmount = 60; // Fixed ₹60 commission or calculate based on affiliate.commission_rate
+                
+                await supabase
+                    .from('commissions')
+                    .insert([{
+                        affiliate_id: affiliate.id,
+                        order_id: paymentId,
+                        amount: commissionAmount,
+                        status: 'unpaid'
+                    }]);
+            }
+        }
+
+        return Response.json({ success: true, proposal });
     } catch (error) {
         console.error('API Error:', error);
         return Response.json({ error: error.message }, { status: 500 });

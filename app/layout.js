@@ -1,4 +1,6 @@
+import { Suspense } from 'react';
 import './globals.css';
+import AffiliateTracker from '../components/AffiliateTracker';
 
 export const metadata = {
   title: 'ValenTiny | Create Your Personalized Valentine Proposal ❤️',
@@ -22,6 +24,9 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
+        <Suspense fallback={null}>
+          <AffiliateTracker />
+        </Suspense>
         {children}
       </body>
     </html>

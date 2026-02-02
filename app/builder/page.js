@@ -194,7 +194,13 @@ export default function BuilderPage() {
             });
             
             const order = await res.json();
-            if (!order.id) throw new Error("Could not create order");
+            
+            if (order.error || !order.id) {
+                console.error("Order Creation Failed:", order);
+                alert(`Checkout Error: ${order.error || "Failed to initialize payment. Please check your API keys."}`);
+                setIsSaving(false);
+                return;
+            }
 
             const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
             if (!razorpayKey) {
@@ -233,7 +239,8 @@ export default function BuilderPage() {
                                 question: formData.question,
                                 imageUrl: formData.imageUrl,
                                 notifyEmail: formData.recipientEmail,
-                                paymentId: response.razorpay_payment_id
+                                paymentId: response.razorpay_payment_id,
+                                refCode: localStorage.getItem('val_ref')
                             })
                         });
                         
@@ -278,7 +285,7 @@ export default function BuilderPage() {
 
     return (
         <div className="builder-layout">
-            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
             <div className="sidebar">
                 <div className="sb-header">
                     <Heart fill="#ff4d79" color="#ff4d79" />
