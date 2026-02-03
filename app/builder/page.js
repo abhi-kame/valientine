@@ -606,6 +606,10 @@ export default function BuilderPage() {
                 }
                 .form-note { font-size: 0.8rem; color: #999; text-align: center; margin-top: 10px; }
                 
+                .mobile-preview-trigger {
+                    display: none;
+                }
+                
                 .preview-area {
                     background: #fdfdfd;
                     padding: 20px;
@@ -744,6 +748,7 @@ export default function BuilderPage() {
                         cursor: pointer;
                         margin-bottom: 10px;
                         width: 100%;
+                        font-size: 1rem;
                     }
                 }
             `}</style>

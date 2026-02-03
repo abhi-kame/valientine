@@ -68,16 +68,15 @@ export default function LandingPageContent() {
           </motion.div>
           <span>ValenTiny</span>
         </div>
-        <Link href="/builder">
-            <motion.div 
-                className="nav-btn"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={triggerBurst}
-            >
-                Get Started
-            </motion.div>
-        </Link>
+        <motion.a 
+            href="/builder"
+            className="nav-btn"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={triggerBurst}
+        >
+            Get Started
+        </motion.a>
       </motion.nav>
 
       <header className="hero">
@@ -101,17 +100,16 @@ export default function LandingPageContent() {
           </motion.p>
           
           <motion.div className="hero-cta" variants={fadeIn}>
-            <Link href="/builder">
-              <motion.div 
-                className="primary-btn"
-                whileHover={{ scale: 1.02, y: -4 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={triggerBurst}
-              >
-                Create Your Proposal — ₹49
-                <ArrowRight size={24} />
-              </motion.div>
-            </Link>
+            <motion.a 
+              href="/builder"
+              className="primary-btn"
+              whileHover={{ scale: 1.02, y: -4 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={triggerBurst}
+            >
+              Create Your Proposal — ₹49
+              <ArrowRight size={24} />
+            </motion.a>
             <p className="subtext">✨ No coding required • Join 5,000+ happy couples</p>
           </motion.div>
         </motion.div>
