@@ -108,31 +108,41 @@
 
 .preview-btn,
 .create-another-btn {
-    padding: 1rem 1.5rem;
-    border-radius: 12px;
+    padding: 1.1rem 1.5rem;
+    border-radius: 16px;
     font-weight: 800;
     text-decoration: none;
-    transition: all 0.2s;
-    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 1.05rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .preview-btn {
     background: #111827;
     color: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.preview-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    background: #000000;
 }
 
 .create-another-btn {
     background: white;
     color: #fb7185;
     border: 2px solid #fff1f2;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
 
 .create-another-btn:hover {
     background: #fff1f2;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(251, 113, 133, 0.1);
 }
 
 /* Tips Section */

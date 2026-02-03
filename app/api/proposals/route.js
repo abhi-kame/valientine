@@ -2,7 +2,7 @@ import { supabase } from '../../../lib/supabase';
 
 export async function POST(req) {
     try {
-        const { id, name, question, imageUrl, notifyEmail, paymentId, refCode } = await req.json();
+        const { id, name, question, imageUrl, template, notifyEmail, paymentId, refCode } = await req.json();
 
         // 1. Insert Proposal
         const { data: proposal, error } = await supabase
@@ -13,6 +13,7 @@ export async function POST(req) {
                     name,
                     question,
                     image_url: imageUrl,
+                    template: template || 'romantic',
                     notify_email: notifyEmail,
                     payment_id: paymentId,
                     created_at: new Date().toISOString(),

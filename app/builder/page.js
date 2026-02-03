@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
-import { Heart, Settings, Eye, CheckCircle, CreditCard, Upload, Loader2, Clipboard } from 'lucide-react';
+import { Heart, Settings, Eye, CheckCircle, CreditCard, Upload, Loader2, Clipboard, Palette } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { uploadBase64Image } from '../../lib/storageUtils';
+import { templates } from '../../lib/templates';
 
 export default function BuilderPage() {
     const router = useRouter();
@@ -14,7 +15,7 @@ export default function BuilderPage() {
         question: 'Will you be my Valentine?',
         recipientEmail: '',
         imageUrl: '/images/catflower.jpg',
-        theme: 'romantic'
+        template: 'romantic'
     });
     const [isSaving, setIsSaving] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -127,18 +128,14 @@ export default function BuilderPage() {
         e.preventDefault();
         if (!isNoRunning) {
             setIsNoRunning(true);
-            setPreviewVideo(true); // Now acts as a visibility toggle
+            setPreviewVideo(true);
             
             if (previewVideoRef.current) {
                 previewVideoRef.current.muted = false;
                 previewVideoRef.current.volume = 1.0;
-                previewVideoRef.current.play().catch(err => {
-                    console.error("Preview video failed:", err);
-                    // Single retry
-                    previewVideoRef.current.muted = false;
-                    previewVideoRef.current.play();
-                });
+                previewVideoRef.current.play().catch(err => console.error("Preview video failed:", err));
             }
+            return; // Don't move on the first interaction
         }
         moveNoButton();
     };
@@ -179,9 +176,61 @@ export default function BuilderPage() {
         }
     };
 
+    const saveProposal = async (paymentId) => {
+        // Generate unique proposal ID
+        const generateUUID = () => {
+            if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        };
+        const uniqueId = generateUUID();
+        
+        // Save proposal to Supabase
+        try {
+            const saveRes = await fetch('/api/proposals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: uniqueId,
+                    name: formData.name,
+                    question: formData.question,
+                    imageUrl: formData.imageUrl,
+                    template: formData.template,
+                    notifyEmail: formData.recipientEmail,
+                    paymentId: paymentId,
+                    refCode: localStorage.getItem('val_ref')
+                })
+            });
+            
+            const saveData = await saveRes.json();
+            
+            if (saveRes.ok) {
+                // Only redirect if save was successful
+                const shareUrl = `${window.location.origin}/p/${uniqueId}`;
+                router.push(`/success?link=${encodeURIComponent(shareUrl)}`);
+            } else {
+                console.error('Failed to save proposal:', saveData.error);
+                alert(`Error saving proposal: ${saveData.error}. Please contact support with your Payment ID: ${paymentId}`);
+            }
+        } catch (err) {
+            console.error('Error saving proposal:', err);
+            alert("Network error while saving your proposal. Please check your connection.");
+        }
+    };
+
     const handleCreate = async (e) => {
         e.preventDefault();
         setIsSaving(true);
+
+        // DEV BYPASS for localhost
+        if (window.location.hostname === 'localhost') {
+            console.log("🛠️ Dev Mode: Bypassing payment for localhost");
+            await saveProposal(`dev_mock_${Date.now()}`);
+            setIsSaving(false);
+            return;
+        }
         
         try {
             const res = await fetch('/api/checkout', {
@@ -223,46 +272,7 @@ export default function BuilderPage() {
                 description: `Proposal for ${formData.name}`,
                 order_id: order.id,
                 handler: async function (response) {
-                    // Generate unique proposal ID
-                    const generateUUID = () => {
-                        if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
-                        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-                            return v.toString(16);
-                        });
-                    };
-                    const uniqueId = generateUUID();
-                    
-                    // Save proposal to Supabase
-                    try {
-                        const saveRes = await fetch('/api/proposals', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                id: uniqueId,
-                                name: formData.name,
-                                question: formData.question,
-                                imageUrl: formData.imageUrl,
-                                notifyEmail: formData.recipientEmail,
-                                paymentId: response.razorpay_payment_id,
-                                refCode: localStorage.getItem('val_ref')
-                            })
-                        });
-                        
-                        const saveData = await saveRes.json();
-                        
-                        if (saveRes.ok) {
-                            // Only redirect if save was successful
-                            const shareUrl = `${window.location.origin}/p/${uniqueId}`;
-                            router.push(`/success?link=${encodeURIComponent(shareUrl)}`);
-                        } else {
-                            console.error('Failed to save proposal:', saveData.error);
-                            alert(`Error saving proposal: ${saveData.error}. Please contact support with your Payment ID: ${response.razorpay_payment_id}`);
-                        }
-                    } catch (err) {
-                        console.error('Error saving proposal:', err);
-                        alert("Network error while saving your proposal. Please check your connection.");
-                    }
+                    await saveProposal(response.razorpay_payment_id);
                 },
                 prefill: {
                     email: formData.recipientEmail,
@@ -373,6 +383,23 @@ export default function BuilderPage() {
                     </div>
 
                     <div className="input-group">
+                        <label><Palette size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />Choose Template Style</label>
+                        <div className="template-grid">
+                            {templates.map((template) => (
+                                <div 
+                                    key={template.id}
+                                    className={`template-item ${formData.template === template.id ? 'active' : ''}`}
+                                    onClick={() => setFormData(prev => ({ ...prev, template: template.id }))}
+                                    style={{ background: template.background }}
+                                >
+                                    <span className="template-emoji">{template.preview}</span>
+                                    <span className="template-name">{template.name}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="input-group">
                         <label>Your Email (for 'Yes' notifications)</label>
                         <input 
                             name="recipientEmail" 
@@ -413,7 +440,7 @@ export default function BuilderPage() {
                     <Eye size={16} /> Live Preview (Mobile)
                 </div>
                 
-                <div className="preview-frame">
+                <div className="preview-frame" style={{ background: templates.find(t => t.id === formData.template)?.background }}>
                     <div className="preview-inner-content">
                         <video 
                             ref={previewVideoRef}
@@ -438,13 +465,21 @@ export default function BuilderPage() {
                                 src={previewView === 'yes' ? '/images/dance.gif' : (formData.imageUrl || '/images/catflower.jpg')} 
                                 className={`preview-image ${previewView === 'yes' ? 'pulse-animation' : ''}`} 
                                 alt="Preview" 
+                                style={{
+                                    width: '180px',
+                                    maxHeight: '220px',
+                                    objectFit: 'cover',
+                                    borderRadius: '16px',
+                                    border: '3px solid white',
+                                    boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
+                                }}
                             />
                         )}
                         
-                        <h2 className="preview-hh">
+                        <h2 className="preview-hh" style={{ color: templates.find(t => t.id === formData.template)?.titleColor }}>
                             {previewView === 'yes' ? 'Yay! ❤️' : (isNoRunning ? 'Choose Wisely! 🔫' : (formData.name || "Partner's Name"))}
                         </h2>
-                        <p className="preview-pp">
+                        <p className="preview-pp" style={{ color: templates.find(t => t.id === formData.template)?.questionColor }}>
                             {previewView === 'yes' ? `See you on the 14th! ❤️` : (formData.question || 'Will you be my Valentine?')}
                         </p>
                         
@@ -453,12 +488,21 @@ export default function BuilderPage() {
                                 <button 
                                     className="preview-btn yes" 
                                     onClick={handleYesPreview}
+                                    style={{ 
+                                        background: templates.find(t => t.id === formData.template)?.yesBtnBg,
+                                        color: templates.find(t => t.id === formData.template)?.yesBtnColor
+                                    }}
                                 >
-                                    Yes
+                                    Yes! 💕
                                 </button>
                                 <button 
                                     className="preview-btn no" 
-                                    style={noBtnPos}
+                                    style={{ 
+                                        ...noBtnPos,
+                                        background: templates.find(t => t.id === formData.template)?.noBtnBg,
+                                        color: templates.find(t => t.id === formData.template)?.noBtnColor,
+                                        border: `2px solid ${templates.find(t => t.id === formData.template)?.noBtnBorder}`
+                                    }}
                                     onMouseEnter={isNoRunning ? moveNoButton : undefined}
                                     onClick={handleNoInteraction}
                                 >
@@ -474,6 +518,22 @@ export default function BuilderPage() {
                         )}
                     </div>
                 </div>
+                
+                {showMobilePreview && (
+                    <div style={{ padding: '20px', width: '100%', maxWidth: '320px', zIndex: 1001 }}>
+                        <button 
+                            onClick={(e) => {
+                                setShowMobilePreview(false);
+                                handleCreate(e);
+                            }}
+                            className="save-btn"
+                            style={{ width: '100%', margin: 0, boxShadow: '0 10px 30px rgba(255, 77, 121, 0.3)' }}
+                        >
+                            <Heart size={20} fill="white" /> Create My Proposal — ₹49
+                        </button>
+                    </div>
+                )}
+
                 <audio ref={audioRef} src="/Minions Cheering.mp4" />
             </div>
 
@@ -515,6 +575,38 @@ export default function BuilderPage() {
                 }
                 .img-item.active {
                     border-color: #ff4d79;
+                }
+                .template-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 12px;
+                    margin-top: 8px;
+                }
+                .template-item {
+                    padding: 12px;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 4px;
+                    border: 3px solid transparent;
+                    transition: all 0.2s;
+                    color: white;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+                }
+                .template-item.active {
+                    border-color: #ff4d79;
+                    transform: scale(1.02);
+                }
+                .template-emoji {
+                    font-size: 1.5rem;
+                }
+                .template-name {
+                    font-size: 0.75rem;
+                    font-weight: 700;
+                    text-align: center;
                 }
                 .upload-label {
                     display: flex;
@@ -590,19 +682,31 @@ export default function BuilderPage() {
                     border-color: #ff4d79;
                 }
                 .save-btn {
-                    background: #ff4d79;
+                    background: linear-gradient(135deg, #ff4d79 0%, #f43f5e 100%);
                     color: white;
                     border: none;
-                    padding: 15px;
-                    border-radius: 12px;
-                    font-weight: 700;
+                    padding: 18px;
+                    border-radius: 16px;
+                    font-weight: 800;
                     cursor: pointer;
                     font-size: 1.1rem;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    gap: 10px;
-                    margin-top: 20px;
+                    gap: 12px;
+                    margin-top: 25px;
+                    box-shadow: 0 10px 25px rgba(255, 77, 121, 0.25);
+                    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .save-btn:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 35px rgba(255, 77, 121, 0.35);
+                    filter: brightness(1.05);
+                }
+                .save-btn:disabled {
+                    opacity: 0.7;
+                    cursor: not-allowed;
+                    transform: none;
                 }
                 .form-note { font-size: 0.8rem; color: #999; text-align: center; margin-top: 10px; }
                 
@@ -620,23 +724,25 @@ export default function BuilderPage() {
                     overflow: hidden;
                 }
                 .preview-label {
-                    background: #333;
+                    background: #ff4d79;
                     color: white;
-                    padding: 6px 14px;
+                    padding: 8px 16px;
                     border-radius: 50px;
-                    font-size: 0.8rem;
-                    margin-bottom: 20px;
+                    font-size: 0.85rem;
+                    margin-bottom: 25px;
                     display: flex;
                     align-items: center;
-                    gap: 6px;
+                    gap: 8px;
+                    box-shadow: 0 4px 12px rgba(255, 77, 121, 0.2);
+                    font-weight: 700;
                 }
-                .preview-frame {
+                :global(.preview-frame) {
                     width: 320px;
                     height: 640px;
                     background: radial-gradient(circle, #ffdde1 0%, #ee9ca7 100%);
-                    border: 12px solid #333;
+                    border: 10px solid #2d2d2d;
                     border-radius: 40px;
-                    box-shadow: 0 40px 100px rgba(0,0,0,0.1);
+                    box-shadow: 0 40px 100px rgba(0,0,0,0.15);
                     position: relative;
                     overflow: hidden;
                 }
@@ -657,43 +763,57 @@ export default function BuilderPage() {
                 }
                 .preview-hh {
                     font-family: 'Dancing Script', cursive;
-                    font-size: 1.8rem;
-                    color: #71004f;
+                    font-size: clamp(1.5rem, 5vw, 2.2rem);
+                    line-height: 1.2;
+                    margin-bottom: 5px;
+                    word-wrap: break-word;
+                    width: 100%;
                 }
                 .preview-pp {
                     font-weight: 700;
-                    color: #ff2a6d;
-                    font-size: 1.1rem;
+                    font-size: clamp(0.9rem, 3vw, 1.1rem);
+                    line-height: 1.4;
+                    padding: 0 10px;
                 }
-                .preview-buttons {
+                :global(.preview-buttons) {
                     display: flex;
-                    gap: 10px;
-                    margin-top: 10px;
+                    gap: 15px;
+                    margin-top: 20px;
                     width: 100%;
-                    max-width: 250px;
+                    max-width: 260px;
                     justify-content: center;
+                    position: relative;
+                    min-height: 55px;
+                    z-index: 20;
                 }
-                .preview-btn {
-                    min-width: 100px;
-                    height: 40px;
-                    border-radius: 50px;
-                    font-weight: 700;
+                :global(.preview-btn) {
+                    padding: 8px 15px;
+                    min-width: 110px;
+                    height: 50px;
+                    border-radius: 18px;
+                    font-weight: 800;
+                    font-size: 1rem;
                     border: none;
-                    font-size: 0.9rem;
                     cursor: pointer;
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 0 10px;
+                    transition: all 0.3s ease;
+                    white-space: nowrap;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
                 }
-                .preview-btn.no {
-                    background: white;
-                    color: #ff4d79;
-                    border: 2px solid #ff4d79;
+                :global(.preview-btn.no) {
+                    /* Colors handled by template style prop */
                 }
-                .preview-btn.yes {
-                    background: #ff4d79;
-                    color: white;
+                :global(.preview-btn.no:hover) {
+                    filter: brightness(0.95);
+                }
+                :global(.preview-btn.yes) {
+                    /* Colors handled by template style prop */
+                    box-shadow: 0 8px 20px rgba(255, 77, 121, 0.25);
+                }
+                :global(.preview-btn:hover) {
+                    transform: translateY(-2px);
                 }
 
                 @media (max-width: 900px) {
@@ -722,6 +842,8 @@ export default function BuilderPage() {
                     }
                     .preview-area.mobile-open {
                         display: flex;
+                        justify-content: center;
+                        align-items: center;
                     }
                     .close-preview {
                         position: absolute;
@@ -734,21 +856,45 @@ export default function BuilderPage() {
                         border-radius: 50px;
                         font-weight: 700;
                     }
+                    :global(.preview-buttons) {
+                        flex-direction: row;
+                        gap: 10px;
+                        width: 100%;
+                        max-width: 280px;
+                        padding: 0 10px;
+                    }
+                    :global(.preview-btn) {
+                        flex: 1;
+                        min-width: 90px;
+                        max-width: 120px;
+                        height: 46px;
+                    }
                     .mobile-preview-trigger {
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        gap: 10px;
-                        padding: 14px;
-                        background: white;
-                        border: 2px solid #ff4d79;
-                        color: #ff4d79;
-                        border-radius: 12px;
-                        font-weight: 700;
+                        gap: 12px;
+                        padding: 16px;
+                        background: #ff4d79;
+                        border: none;
+                        color: white;
+                        border-radius: 16px;
+                        font-weight: 800;
                         cursor: pointer;
-                        margin-bottom: 10px;
+                        margin: 10px 0 15px 0;
                         width: 100%;
-                        font-size: 1rem;
+                        font-size: 1.1rem;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                        box-shadow: 0 8px 15px rgba(255, 77, 121, 0.3);
+                        letter-spacing: 0.02em;
+                    }
+                    .mobile-preview-trigger:hover {
+                        background: #ff2a6d;
+                        transform: translateY(-2px);
+                        box-shadow: 0 12px 25px rgba(255, 77, 121, 0.4);
+                    }
+                    .mobile-preview-trigger:active {
+                        transform: translateY(0);
                     }
                 }
             `}</style>
