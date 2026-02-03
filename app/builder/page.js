@@ -667,9 +667,10 @@ export default function BuilderPage() {
                     margin-top: 10px;
                     width: 100%;
                     max-width: 250px;
+                    justify-content: center;
                 }
                 .preview-btn {
-                    width: 100px;
+                    min-width: 100px;
                     height: 40px;
                     border-radius: 50px;
                     font-weight: 700;
@@ -679,6 +680,7 @@ export default function BuilderPage() {
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    padding: 0 10px;
                 }
                 .preview-btn.no {
                     background: white;
@@ -720,7 +722,6 @@ export default function BuilderPage() {
                     .close-preview {
                         position: absolute;
                         top: 20px;
-                        right: 20px;
                         z-index: 1001;
                         background: #ff4d79;
                         color: white;

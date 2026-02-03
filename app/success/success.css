@@ -1,0 +1,191 @@
+/* Success Page Styles - Modern Elegant Aesthetic */
+
+.success-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    font-family: 'Outfit', sans-serif;
+    box-sizing: border-box;
+}
+
+.success-card {
+    background: white;
+    border-radius: 2rem;
+    padding: 2.5rem;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.success-icon {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.success-card h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.success-card .subtitle {
+    color: #6b7280;
+    margin-bottom: 2.5rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+/* Link Section */
+.link-section {
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.link-section label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #374151;
+    display: block;
+    margin-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.link-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.link-input {
+    padding: 1rem;
+    border: 2px solid #f1f5f9;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f8fafc;
+    color: #334155;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.copy-btn {
+    padding: 1rem 1.5rem;
+    background: #fb7185;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(251, 113, 133, 0.2);
+}
+
+.copy-btn:hover {
+    background: #f43f5e;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(251, 113, 133, 0.3);
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 2rem;
+}
+
+.preview-btn,
+.create-another-btn {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    transition: all 0.2s;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.preview-btn {
+    background: #111827;
+    color: white;
+}
+
+.create-another-btn {
+    background: white;
+    color: #fb7185;
+    border: 2px solid #fff1f2;
+}
+
+.create-another-btn:hover {
+    background: #fff1f2;
+}
+
+/* Tips Section */
+.tips {
+    background: #fafafa;
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    text-align: left;
+    border: 1px solid #f1f5f9;
+}
+
+.tips h3 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.tips li {
+    padding: 8px 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: start;
+    gap: 8px;
+}
+
+.tips li::before {
+    content: "🌸";
+    font-size: 0.8rem;
+}
+
+/* Desktop Styles */
+@media (min-width: 640px) {
+    .link-box {
+        flex-direction: row;
+    }
+
+    .link-input {
+        flex: 1;
+    }
+
+    .action-buttons {
+        flex-direction: row;
+    }
+
+    .preview-btn, .create-another-btn {
+        flex: 1;
+    }
+}
