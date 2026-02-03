@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Settings, Eye, CheckCircle, CreditCard, Upload, Loader2, Clipboard, Palette } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { uploadBase64Image } from '../../lib/storageUtils';
@@ -154,7 +155,8 @@ export default function BuilderPage() {
             top: `${y}%`,
             zIndex: 10,
             transform: 'translate(-50%, -50%)',
-            margin: 0
+            margin: 0,
+            width: '120px' // Enforce width when absolute
         });
     };
 
@@ -441,62 +443,72 @@ export default function BuilderPage() {
                 </div>
                 
                 <div className="preview-frame" style={{ background: templates.find(t => t.id === formData.template)?.background }}>
-                    <div className="preview-inner-content">
-                        <video 
-                            ref={previewVideoRef}
-                            src="/sugar.mp4#t=42" 
-                            loop 
-                            playsInline
-                            preload="auto"
-                            className="preview-image" 
-                            style={{ 
-                                position: previewVideo ? 'relative' : 'absolute',
-                                opacity: previewVideo ? 1 : 0.01,
-                                zIndex: previewVideo ? 1 : -1,
-                                width: '180px',
-                                aspectRatio: '3/4',
-                                height: previewVideo ? 'auto' : '1px',
-                                objectFit: 'cover'
-                            }}
-                        />
-
-                        {!previewVideo && (
-                            <img 
-                                src={previewView === 'yes' ? '/images/dance.gif' : (formData.imageUrl || '/images/catflower.jpg')} 
-                                className={`preview-image ${previewView === 'yes' ? 'pulse-animation' : ''}`} 
-                                alt="Preview" 
-                                style={{
-                                    width: '180px',
-                                    maxHeight: '220px',
-                                    objectFit: 'cover',
-                                    borderRadius: '16px',
-                                    border: '3px solid white',
-                                    boxShadow: '0 8px 20px rgba(0,0,0,0.1)'
+                    <div className={`proposal-card preview-mode ${previewView === 'yes' ? 'success-mode' : ''} ${isNoRunning ? 'scary-mode' : ''}`}>
+                        <div className="card-glass-overlay"></div>
+                        
+                        <div className="media-container">
+                            <video 
+                                ref={previewVideoRef}
+                                src="/sugar.mp4#t=42" 
+                                loop 
+                                playsInline
+                                preload="auto"
+                                className="proposal-media" 
+                                style={{ 
+                                    position: previewVideo ? 'relative' : 'absolute',
+                                    opacity: previewVideo ? 1 : 0.01,
+                                    zIndex: previewVideo ? 1 : -1,
+                                    width: '100%',
+                                    maxWidth: '180px',
+                                    aspectRatio: '9/16',
+                                    height: previewVideo ? 'auto' : '1px',
+                                    objectFit: 'cover'
                                 }}
                             />
-                        )}
+
+                            {!previewVideo && (
+                                <img 
+                                    src={previewView === 'yes' ? '/images/dance.gif' : (formData.imageUrl || '/images/catflower.jpg')} 
+                                    className={`proposal-media ${previewView === 'yes' ? 'pulse' : ''}`} 
+                                    alt="Preview" 
+                                    style={{
+                                        width: '100%',
+                                        maxWidth: '180px',
+                                        maxHeight: '220px',
+                                        objectFit: 'cover',
+                                        borderRadius: '20px',
+                                        border: '4px solid white',
+                                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
+                                    }}
+                                />
+                            )}
+                        </div>
                         
-                        <h2 className="preview-hh" style={{ color: templates.find(t => t.id === formData.template)?.titleColor }}>
-                            {previewView === 'yes' ? 'Yay! ❤️' : (isNoRunning ? 'Choose Wisely! 🔫' : (formData.name || "Partner's Name"))}
-                        </h2>
-                        <p className="preview-pp" style={{ color: templates.find(t => t.id === formData.template)?.questionColor }}>
-                            {previewView === 'yes' ? `See you on the 14th! ❤️` : (formData.question || 'Will you be my Valentine?')}
-                        </p>
+                        <div className="text-content">
+                            <h2 className="proposal-title" style={{ color: templates.find(t => t.id === formData.template)?.titleColor }}>
+                                {previewView === 'yes' ? 'Yay! ❤️' : (isNoRunning ? 'Choose Wisely! 🔫' : (formData.name || "Partner's Name"))}
+                            </h2>
+                            <p className="proposal-question" style={{ color: templates.find(t => t.id === formData.template)?.questionColor }}>
+                                {previewView === 'yes' ? `See you on the 14th! ❤️` : (formData.question || 'Will you be my Valentine?')}
+                            </p>
+                        </div>
                         
                         {previewView === 'ask' && (
-                            <div className="preview-buttons">
-                                <button 
-                                    className="preview-btn yes" 
+                            <div className="buttons-container">
+                                <motion.button 
+                                    className="btn yes-btn" 
                                     onClick={handleYesPreview}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
                                     style={{ 
                                         background: templates.find(t => t.id === formData.template)?.yesBtnBg,
                                         color: templates.find(t => t.id === formData.template)?.yesBtnColor
                                     }}
                                 >
                                     Yes! 💕
-                                </button>
-                                <button 
-                                    className="preview-btn no" 
+                                </motion.button>
+                                <motion.button 
+                                    className={`btn no-btn ${isNoRunning ? 'scary' : ''}`} 
                                     style={{ 
                                         ...noBtnPos,
                                         background: templates.find(t => t.id === formData.template)?.noBtnBg,
@@ -504,16 +516,18 @@ export default function BuilderPage() {
                                         border: `2px solid ${templates.find(t => t.id === formData.template)?.noBtnBorder}`
                                     }}
                                     onMouseEnter={isNoRunning ? moveNoButton : undefined}
+                                    onTouchStart={isNoRunning ? moveNoButton : undefined}
                                     onClick={handleNoInteraction}
+                                    layout
                                 >
                                     No
-                                </button>
+                                </motion.button>
                             </div>
                         )}
 
                         {previewView === 'yes' && (
-                            <button className="preview-btn reset" onClick={resetPreview} style={{ marginTop: '20px' }}>
-                                Reset Preview
+                            <button className="reset-preview-btn" onClick={resetPreview}>
+                                Try Again?
                             </button>
                         )}
                     </div>
@@ -745,54 +759,105 @@ export default function BuilderPage() {
                     box-shadow: 0 40px 100px rgba(0,0,0,0.15);
                     position: relative;
                     overflow: hidden;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
-                .preview-inner-content {
-                    padding: 20px;
-                    height: 100%;
+                :global(.proposal-card.preview-mode) {
+                    background: rgba(255, 255, 255, 0.5);
+                    backdrop-filter: blur(15px);
+                    -webkit-backdrop-filter: blur(15px);
+                    border: 1px solid rgba(255, 255, 255, 0.4);
+                    border-radius: 30px;
+                    padding: 25px 15px;
+                    text-align: center;
+                    width: 90%;
+                    max-width: 280px;
+                    margin: 0 auto;
                     display: flex;
                     flex-direction: column;
                     align-items: center;
                     justify-content: center;
-                    text-align: center;
                     gap: 15px;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                    /* Removed position: relative to allow dodge button to move freely in frame */
                 }
-                .preview-image {
-                    width: 180px;
-                    border-radius: 20px;
-                    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+                :global(.card-glass-overlay) {
+                    position: absolute;
+                    top: 0;
+                    right: 0;
+                    bottom: 0;
+                    left: 0;
+                    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+                    pointer-events: none;
                 }
-                .preview-hh {
-                    font-family: 'Dancing Script', cursive;
-                    font-size: clamp(1.5rem, 5vw, 2.2rem);
-                    line-height: 1.2;
-                    margin-bottom: 5px;
-                    word-wrap: break-word;
+                .media-container {
                     width: 100%;
-                }
-                .preview-pp {
-                    font-weight: 700;
-                    font-size: clamp(0.9rem, 3vw, 1.1rem);
-                    line-height: 1.4;
-                    padding: 0 10px;
-                }
-                :global(.preview-buttons) {
                     display: flex;
-                    gap: 15px;
-                    margin-top: 20px;
-                    width: 100%;
-                    max-width: 260px;
                     justify-content: center;
                     position: relative;
-                    min-height: 55px;
-                    z-index: 20;
                 }
-                :global(.preview-btn) {
-                    padding: 8px 15px;
-                    min-width: 110px;
-                    height: 50px;
-                    border-radius: 18px;
-                    font-weight: 800;
+                :global(.proposal-media) {
+                    border-radius: 15px;
+                    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+                }
+                :global(.proposal-card.preview-mode.success-mode) {
+                    gap: 12px;
+                    padding: 20px 15px;
+                }
+                :global(.proposal-card.preview-mode.success-mode .proposal-media) {
+                    max-width: 140px;
+                    max-height: 180px;
+                }
+                :global(.proposal-card.preview-mode.success-mode .proposal-title) {
+                    font-size: 1.6rem;
+                }
+                :global(.proposal-card.preview-mode.success-mode .reset-preview-btn) {
+                    margin-top: 8px;
+                }
+                :global(.proposal-card.preview-mode.scary-mode) {
+                    gap: 10px;
+                    padding: 15px;
+                }
+                :global(.proposal-card.preview-mode.scary-mode .proposal-media) {
+                    max-width: 140px;
+                    max-height: 220px;
+                }
+                :global(.proposal-card.preview-mode.scary-mode .proposal-title) {
+                    font-size: 1.6rem;
+                }
+                .text-content {
+                    width: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 8px;
+                }
+                .proposal-title {
+                    font-family: 'Dancing Script', cursive;
+                    font-size: 1.8rem;
+                    line-height: 1.2;
+                    margin: 0;
+                }
+                .proposal-question {
+                    font-weight: 700;
                     font-size: 1rem;
+                    line-height: 1.4;
+                }
+                :global(.buttons-container) {
+                    display: flex;
+                    gap: 10px;
+                    margin-top: 10px;
+                    width: 100%;
+                    justify-content: center;
+                    min-height: 45px;
+                    /* Removed position: relative to allow dodge button to reference preview-frame */
+                }
+                :global(.btn) {
+                    width: 120px;
+                    height: 44px;
+                    border-radius: 15px;
+                    font-weight: 800;
+                    font-size: 0.9rem;
                     border: none;
                     cursor: pointer;
                     display: flex;
@@ -801,19 +866,39 @@ export default function BuilderPage() {
                     transition: all 0.3s ease;
                     white-space: nowrap;
                     box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+                    position: relative;
+                    overflow: hidden;
                 }
-                :global(.preview-btn.no) {
-                    /* Colors handled by template style prop */
+                :global(.btn.no-btn) {
+                    background: white;
+                    color: #ff4d79;
+                    border: 2px solid rgba(255, 77, 121, 0.2);
                 }
-                :global(.preview-btn.no:hover) {
+                :global(.btn.no-btn.scary) {
+                    background: #fffafa;
+                    border-color: #ff0000;
+                    color: #ff0000;
+                    box-shadow: 0 0 15px rgba(255, 0, 0, 0.1);
+                }
+                :global(.btn:hover) {
+                    transform: translateY(-2px);
                     filter: brightness(0.95);
                 }
-                :global(.preview-btn.yes) {
-                    /* Colors handled by template style prop */
-                    box-shadow: 0 8px 20px rgba(255, 77, 121, 0.25);
+                .reset-preview-btn {
+                    margin-top: 15px;
+                    padding: 10px 20px;
+                    background: rgba(0,0,0,0.05);
+                    border: 1px solid rgba(0,0,0,0.1);
+                    color: #666;
+                    border-radius: 12px;
+                    font-weight: 700;
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    transition: all 0.2s;
                 }
-                :global(.preview-btn:hover) {
-                    transform: translateY(-2px);
+                .reset-preview-btn:hover {
+                    background: rgba(0,0,0,0.1);
+                    color: #333;
                 }
 
                 @media (max-width: 900px) {

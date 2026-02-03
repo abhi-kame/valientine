@@ -20,9 +20,14 @@ export default function ProposalPage() {
     const [isNoRunning, setIsNoRunning] = useState(false);
     const [showVideo, setShowVideo] = useState(false);
     const [noBtnPos, setNoBtnPos] = useState({ position: 'relative' });
+    const [mounted, setMounted] = useState(false);
     
     const audioRef = useRef(null);
     const videoRef = useRef(null);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         const fetchProposal = async () => {
@@ -80,7 +85,8 @@ export default function ProposalPage() {
             top: `${y}vh`,
             zIndex: 100,
             transform: 'translate(-50%, -50%)',
-            margin: 0
+            margin: 0,
+            width: '160px' // Keep width stable during dodge
         });
     };
 
@@ -123,7 +129,7 @@ export default function ProposalPage() {
         }
     };
 
-    if (loading) {
+    if (!mounted || loading) {
         return (
             <div style={{ 
                 display: 'flex', 
@@ -264,7 +270,7 @@ export default function ProposalPage() {
                                 Yes! 💕
                             </motion.button>
                             <motion.button 
-                                className="btn no-btn"
+                                className={`btn no-btn ${isNoRunning ? 'scary' : ''}`}
                                 style={{ 
                                     ...noBtnPos,
                                     background: currentTemplate.noBtnBg,
@@ -396,8 +402,8 @@ export default function ProposalPage() {
                     z-index: 20;
                 }
                 :global(.btn) {
-                    padding: 15px 35px;
-                    min-width: 160px;
+                    padding: 15px 25px;
+                    width: 160px;
                     height: 60px;
                     border-radius: 25px;
                     font-weight: 800;
@@ -418,9 +424,11 @@ export default function ProposalPage() {
                 :global(.no-btn) {
                     /* Colors handled by template style prop */
                 }
-                :global(.no-btn:hover) {
-                    filter: brightness(0.95);
-                    transform: translateY(-2px);
+                :global(.no-btn.scary) {
+                    background: #fffafa !important;
+                    border-color: #ff0000 !important;
+                    color: #ff0000 !important;
+                    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2) !important;
                 }
                 :global(.yes-btn) {
                     /* Colors handled by template style prop */
@@ -458,9 +466,7 @@ export default function ProposalPage() {
                         justify-content: center;
                     }
                     :global(.btn) {
-                        flex: 1;
-                        max-width: 140px;
-                        min-width: 110px;
+                        width: 135px;
                         height: 52px;
                         font-size: 1.05rem;
                         border-radius: 18px;

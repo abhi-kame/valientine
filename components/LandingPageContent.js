@@ -1,7 +1,7 @@
 'use client';
+import { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, Sparkles, Send, ShieldCheck, ArrowRight, Star, Coffee, Camera, Music } from 'lucide-react';
-import { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import HeroImage from './HeroImage';
 import FloatingHearts from './FloatingHearts';
@@ -28,12 +28,20 @@ const staggerContainer = {
 };
 
 export default function LandingPageContent() {
+  const [mounted, setMounted] = useState(false);
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+  
   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
   const y2 = useTransform(scrollY, [0, 500], [0, -150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   
   const burstRef = useRef(null);
+
+  if (!mounted) return null;
 
   const triggerBurst = (e) => {
       const x = e.clientX;
