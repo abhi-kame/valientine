@@ -119,20 +119,24 @@ export default function AffiliateSignup() {
       <style jsx>{`
         .signup-page {
           min-height: 100vh;
-          background: #fff0f3;
+          background: white;
+          background-image: radial-gradient(#fff0f3 1px, transparent 1px);
+          background-size: 20px 20px;
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 20px;
-          font-family: 'Quicksand', sans-serif;
+          font-family: 'Outfit', 'Quicksand', sans-serif;
+          color: #0f172a;
         }
         .form-card {
           background: white;
-          padding: 40px;
+          padding: 48px;
           border-radius: 32px;
           width: 100%;
           max-width: 450px;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+          box-shadow: 0 20px 60px -10px rgba(0,0,0,0.08);
+          border: 1px solid #f1f5f9;
         }
         .logo {
           display: flex;
@@ -144,27 +148,29 @@ export default function AffiliateSignup() {
           color: #ff4d79;
           margin-bottom: 30px;
         }
-        h2 { font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
-        p { text-align: center; color: #64748b; margin-bottom: 30px; }
+        h2 { font-size: 2rem; font-weight: 800; text-align: center; margin-bottom: 8px; color: #0f172a; }
+        p { text-align: center; color: #64748b; margin-bottom: 30px; font-weight: 500; }
         
         form { display: flex; flex-direction: column; gap: 20px; }
         .input-group { display: flex; flex-direction: column; gap: 8px; }
-        label { font-size: 0.9rem; font-weight: 700; color: #1e293b; }
+        label { font-size: 0.9rem; font-weight: 700; color: #334155; }
         input {
-          padding: 14px;
-          border: 2px solid #f1f5f9;
-          border-radius: 12px;
+          padding: 16px;
+          border: 2px solid #e2e8f0;
+          border-radius: 16px;
           font-family: inherit;
           font-size: 1rem;
+          background: #f8fafc;
+          transition: all 0.2s;
         }
-        input:focus { outline: none; border-color: #ff4d79; }
+        input:focus { outline: none; border-color: #ff4d79; background: white; box-shadow: 0 0 0 4px #fff0f3; }
         
         button {
-          padding: 16px;
+          padding: 18px;
           background: #ff4d79;
           color: white;
           border: none;
-          border-radius: 12px;
+          border-radius: 16px;
           font-weight: 700;
           font-size: 1.1rem;
           cursor: pointer;
@@ -172,13 +178,18 @@ export default function AffiliateSignup() {
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: all 0.2s;
+          box-shadow: 0 10px 20px rgba(255, 77, 121, 0.2);
         }
+        button:hover { background: #ff2a6d; transform: translateY(-2px); box-shadow: 0 15px 30px rgba(255, 77, 121, 0.3); }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; box-shadow: none; transform: none; }
         
         .spinner { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        .footer-text { margin-top: 24px; font-size: 0.9rem; }
-        a { color: #ff4d79; font-weight: 700; text-decoration: none; }
+        .footer-text { margin-top: 24px; font-size: 0.95rem; border-top: 1px solid #f1f5f9; padding-top: 24px; }
+        a { color: #ff4d79; font-weight: 700; text-decoration: none; margin-left: 4px; transition: color 0.2s; }
+        a:hover { color: #ff2a6d; }
       `}</style>
     </div>
   );

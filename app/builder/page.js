@@ -478,13 +478,13 @@ export default function BuilderPage() {
             </div>
 
             <style jsx>{`
-                @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
                 .builder-layout {
                     display: grid;
                     grid-template-columns: 420px 1fr;
                     height: 100vh;
-                    font-family: 'Quicksand', sans-serif;
+                    font-family: 'Outfit', 'Quicksand', sans-serif;
                     background: #fff;
+                    color: #0f172a;
                 }
                 .sidebar {
                     background: white;

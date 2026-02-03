@@ -21,8 +21,8 @@ export const metadata = {
   openGraph: {
     title: 'ValenTiny | Personalized Valentine Proposal Pages',
     description: 'Surprise your special someone with a custom Valentine proposal page. Interactive buttons, cute animations, and instant alerts!',
-    url: 'https://valentiny.com',
-    siteName: 'ValenTiny',
+    url: 'https://valentinyyy.vercel.app/',
+    siteName: 'ValenTinyyy',
     images: [
       {
         url: '/og-image.jpg', // Make sure this exists
@@ -58,6 +58,9 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Outfit:wght@400;500;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body>
         <Suspense fallback={null}>

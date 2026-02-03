@@ -5,27 +5,27 @@ export async function POST(req) {
     const { name, to } = await req.json();
     
     // Check if configuration exists
-    if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
-      console.error("Gmail configuration missing in .env.local");
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
+      console.error("SMTP configuration missing in .env.local");
       return Response.json({ error: "Email configuration missing" }, { status: 500 });
     }
 
-    console.log("Attempting to send email via Gmail user:", process.env.GMAIL_USER);
+    console.log("Attempting to send email via SMTP user:", process.env.SMTP_USER);
 
-    // Create a transporter using explicit Gmail SMTP settings
+    // Create a transporter using explicit SMTP settings
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // Use SSL
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: process.env.SMTP_SECURE === 'true', 
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
       },
     });
 
     const mailOptions = {
-      from: `"ValenTiny" <${process.env.GMAIL_USER}>`,
-      to: to || process.env.RECIPIENT_EMAIL,
+      from: `"${process.env.FROM_NAME || 'ValenTiny'}" <${process.env.SMTP_FROM}>`,
+      to: to || process.env.ADMIN_EMAIL, // Use ADMIN_EMAIL as fallback if no 'to' provided
       subject: `${name} said YES! ❤️`,
       html: `
         <div style="font-family: 'Quicksand', sans-serif; padding: 20px; color: #333; line-height: 1.6;">
@@ -35,7 +35,7 @@ export async function POST(req) {
           </p>
           <p>Get ready for Feb 14th! 🌹</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 0.8rem; color: #999;">Sent with ❤️ by ValenTiny</p>
+          <p style="font-size: 0.8rem; color: #999;">Sent with ❤️ by ${process.env.FROM_NAME || 'ValenTiny'}</p>
         </div>
       `,
     };
