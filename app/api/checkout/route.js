@@ -24,6 +24,7 @@ export async function POST(req) {
 
     const order = await razorpay.orders.create(options);
     console.log("Razorpay Order Created:", order.id);
+    console.log("Razorpay Key Mode:", key_id.startsWith('rzp_live') ? 'LIVE (Real Money)' : 'TEST (Dummy Money)');
     return Response.json(order);
   } catch (error) {
     console.error("Razorpay Order Error Details:", {

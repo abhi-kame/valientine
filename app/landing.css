@@ -108,3 +108,30 @@
   .hero { padding: 60px 5%; }
   .navbar { padding: 20px 5%; }
 }
+
+.footer {
+  padding: 40px 10%;
+  background: #f1f5f9;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+}
+.footer p {
+  color: #64748b;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+.legal-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+}
+.legal-links a {
+  color: #475569;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+}
+.legal-links a:hover {
+  color: #ff4d79;
+}

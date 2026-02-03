@@ -209,6 +209,10 @@ export default function BuilderPage() {
                 setIsSaving(false);
                 return;
             }
+            console.log("Initializing Razorpay using key:", razorpayKey.substring(0, 8) + "...");
+            if (razorpayKey.startsWith('rzp_live')) {
+                console.warn("⚠️ USING LIVE PRODUCTION KEYS. Real money will be deducted.");
+            }
 
             console.log("Initializing Razorpay...");
             const options = {

@@ -50,6 +50,15 @@ export default function LandingPage() {
             <p>Wow them with premium animations, confetti effects, and a responsive interface that works on every device.</p>
         </div>
       </section>
+
+      <footer className="footer">
+        <p>&copy; {new Date().getFullYear()} ValenTiny. All rights reserved.</p>
+        <div className="legal-links">
+            <Link href="/terms">Terms & Conditions</Link>
+            <Link href="/privacy">Privacy Policy</Link>
+            <Link href="/affiliate">Partners</Link>
+        </div>
+      </footer>
     </main>
   );
 }
