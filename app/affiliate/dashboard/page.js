@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../../../lib/supabase';
-import { 
-  Users, 
-  MousePointer2, 
-  IndianRupee, 
-  TrendingUp, 
-  Copy, 
+import {
+  Users,
+  MousePointer2,
+  IndianRupee,
+  TrendingUp,
+  Copy,
   ExternalLink,
   QrCode,
   LayoutDashboard,
@@ -41,8 +41,9 @@ export default function AffiliateDashboard() {
 
       const res = await fetch(`/api/affiliate/stats?userId=${user.id}`);
       const data = await res.json();
-      
+
       if (data.affiliate) {
+        console.log('Dashboard Data Check:', data.stats);
         setAffiliate(data.affiliate);
         setStats(data.stats);
       }
@@ -154,9 +155,9 @@ export default function AffiliateDashboard() {
             <p>Share this link to start earning.</p>
           </div>
           <div className="link-box">
-            <input 
-              readOnly 
-              value={`${typeof window !== 'undefined' ? window.location.origin : ''}?ref=${affiliate.ref_code}`} 
+            <input
+              readOnly
+              value={`${typeof window !== 'undefined' ? window.location.origin : ''}?ref=${affiliate.ref_code}`}
             />
             <button onClick={copyToClipboard} className={copied ? 'copied' : ''}>
               {copied ? <CheckCircle2 size={18} /> : <Copy size={18} />}
@@ -174,7 +175,7 @@ export default function AffiliateDashboard() {
               Request Payout
             </button>
           </div>
-          
+
           <div className="recent-activity">
             <h3>Recent Activity</h3>
             <div className="activity-list">

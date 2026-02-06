@@ -10,7 +10,7 @@ export async function GET(req) {
       .select(`
         *,
         commissions (amount, status),
-        affiliate_clicks (id)
+        affiliate_clicks!affiliate_clicks_affiliate_id_fkey (id)
       `);
 
     if (status) {
