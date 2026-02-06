@@ -1,4 +1,4 @@
-import { supabase } from '../../../../lib/supabase';
+import { supabaseAdmin as supabase } from '../../../../lib/supabase-admin';
 
 export async function GET(req) {
   try {
@@ -21,6 +21,8 @@ export async function GET(req) {
       .from('affiliate_clicks')
       .select('*', { count: 'exact', head: true })
       .eq('affiliate_id', affiliate.id);
+
+    console.log(`Stats debug: Affiliate ID ${affiliate.id}, Clicks Found: ${totalClicks}`);
 
     // 3. Get Commissions (Conversions)
     const { data: commissions } = await supabase

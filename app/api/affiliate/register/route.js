@@ -1,4 +1,4 @@
-import { supabase } from '../../../../lib/supabase';
+import { supabaseAdmin as supabase } from '../../../../lib/supabase-admin';
 import { nanoid } from 'nanoid';
 
 export async function POST(req) {
@@ -29,10 +29,10 @@ export async function POST(req) {
     });
 
     if (authError) {
-        if (authError.message.includes('already registered')) {
-            return Response.json({ error: 'This UPI ID is already registered as a partner. Please log in.' }, { status: 400 });
-        }
-        return Response.json({ error: authError.message }, { status: 400 });
+      if (authError.message.includes('already registered')) {
+        return Response.json({ error: 'This UPI ID is already registered as a partner. Please log in.' }, { status: 400 });
+      }
+      return Response.json({ error: authError.message }, { status: 400 });
     }
 
     const userId = authData.user?.id;

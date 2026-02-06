@@ -1,8 +1,8 @@
-import { supabase } from '../../../../lib/supabase';
+import { supabaseAdmin as supabase } from '../../../../lib/supabase-admin';
 
 export async function POST(req) {
   try {
-    const { refCode, userAgent, path } = await req.json();
+    const { refCode, userAgent, path, referrer } = await req.json();
 
     if (!refCode) return Response.json({ error: 'No ref code' }, { status: 400 });
 
@@ -14,6 +14,7 @@ export async function POST(req) {
       .single();
 
     if (affError || !affiliate) {
+      console.error('Affiliate not found for ref:', refCode);
       return Response.json({ error: 'Invalid referral code' }, { status: 404 });
     }
 
@@ -22,12 +23,18 @@ export async function POST(req) {
       .from('affiliate_clicks')
       .insert([{
         affiliate_id: affiliate.id,
-        user_agent: userAgent,
-        path: path,
+        // visited_path: path, // Not in schema
+        // user_agent: userAgent, // Not in schema
+        referrer_url: referrer,
         ip_address: req.headers.get('x-forwarded-for') || 'unknown'
       }]);
 
-    if (clickError) console.error('Click logging error:', clickError);
+    console.log(`Track Click debug: Inserted for Ref ${refCode}, ID ${affiliate.id}`);
+
+    if (clickError) {
+      console.error('Click logging error:', clickError);
+      return Response.json({ error: 'Database insert failed', details: clickError }, { status: 500 });
+    }
 
     return Response.json({ success: true });
   } catch (error) {
