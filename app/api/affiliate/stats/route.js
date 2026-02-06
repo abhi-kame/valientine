@@ -17,10 +17,13 @@ export async function GET(req) {
     if (affError || !affiliate) return Response.json({ error: 'Affiliate profile not found' }, { status: 404 });
 
     // 2. Get Clicks
-    const { count: totalClicks } = await supabase
+    const { data: clicks, error: clickError } = await supabase
       .from('affiliate_clicks')
-      .select('*', { count: 'exact', head: true })
+      .select('id')
       .eq('affiliate_id', affiliate.id);
+
+    const totalClicks = clicks?.length || 0;
+    if (clickError) console.error('Stats click fetch error:', clickError);
 
     console.log(`Stats debug: Affiliate ID ${affiliate.id}, Clicks Found: ${totalClicks}`);
 

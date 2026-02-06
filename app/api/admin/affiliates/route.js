@@ -10,7 +10,7 @@ export async function GET(req) {
       .select(`
         *,
         commissions (amount, status),
-        affiliate_clicks (count)
+        affiliate_clicks (id)
       `);
 
     if (status) {
@@ -18,6 +18,7 @@ export async function GET(req) {
     }
 
     const { data: affiliates, error } = await query;
+    console.log('Admin Affiliates Debug:', JSON.stringify(affiliates, null, 2));
 
     if (error) throw error;
 
@@ -26,7 +27,7 @@ export async function GET(req) {
       ...aff,
       totalEarnings: aff.commissions.reduce((sum, c) => sum + Number(c.amount), 0),
       unpaidEarnings: aff.commissions.filter(c => c.status === 'unpaid').reduce((sum, c) => sum + Number(c.amount), 0),
-      clickCount: aff.affiliate_clicks?.[0]?.count || 0
+      clickCount: aff.affiliate_clicks?.length || 0
     }));
 
     return Response.json({ affiliates: formatted });
